@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo de Cartas</title>
+<style>
+    .container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+    }
+    .column {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    width: 150px; /* Largura aumentada da coluna */
+    height: 500px; /* Altura aumentada da coluna */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between; /* Espaço entre as imagens */
+}
+
+.card {
+    width: 120px; /* Aumento adicional na largura da carta */
+    height: 180px; /* Aumento adicional na altura da carta */
+    background-color: lightblue;
+    border-radius: 5px;
+    margin: 5px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Oculta partes das imagens que excedem o tamanho do contêiner */
+}
+
+.card img {
+    width: 100%; /* Ajusta a largura da imagem para ocupar todo o espaço do contêiner */
+    height: auto; /* Ajusta a altura automaticamente para manter a proporção */
+}
+
+
+
+    .button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+    <div style="text-align:center; margin-bottom: 10px;">Escolha uma carta mentalmente e informe nos botões ao lado em qual coluna a carta se encontra:</div>
+<div class="container" id="container-123">
+    <div class="column" id="column-1">Coluna 1</div>
+    <div class="column" id="column-2">Coluna 2</div>
+    <div class="column" id="column-3">Coluna 3</div>
+    <div class="button-container" id="button-container-123">
+        <button class="button" id="button-1">Coluna 1</button>
+        <button class="button" id="button-2">Coluna 2</button>
+        <button class="button" id="button-3">Coluna 3</button>
+    </div>
+</div>
+<div style="text-align:center; margin-bottom: 10px;">Informe nos botões ao lado em qual coluna a carta se encontra:</div>
+<div class="container" id="container-456">
+    <div class="column" id="column-4">Coluna 4</div>
+    <div class="column" id="column-5">Coluna 5</div>
+    <div class="column" id="column-6">Coluna 6</div>
+    <div class="button-container" id="button-container-456">
+        <button class="button" id="button-4">Coluna 4</button>
+        <button class="button" id="button-5">Coluna 5</button>
+        <button class="button" id="button-6">Coluna 6</button>
+    </div>
+</div>
+<div style="text-align:center; margin-bottom: 10px;">Informe nos botões ao lado em qual coluna a carta se encontra:</div>
+<div class="container" id="container-789">
+    <div class="column" id="column-7">Coluna 7</div>
+    <div class="column" id="column-8">Coluna 8</div>
+    <div class="column" id="column-9">Coluna 9</div>
+    <div class="button-container" id="button-container-789">
+        <button class="button" id="button-7">Coluna 7</button>
+        <button class="button" id="button-8">Coluna 8</button>
+        <button class="button" id="button-9">Coluna 9</button>
+    </div>
+</div>
+<div style="text-align:center; margin-bottom: 10px;"> Clique no botão ao lado para descobrir qual é a carta escolhida:</div>
+
+<button class="button" id="show-selected-card">A sua carta é</button>
+
+<div id="selected-card-container"></div> <!-- Container para exibir a carta selecionada -->
+
+<script>
+// Variáveis globais para controlar os cliques
+let column123Clicked = false;
+let column456Clicked = false;
+let column789Clicked = false;
+
+// Inicializar o jogo
+initializeGame();
+
+// Função para inicializar o jogo
+function initializeGame() {
+    // Exibir as cartas inicialmente nas colunas 1, 2 e 3
+    displayInitialCards();
+
+    // Event listeners para os botões das colunas 1, 2 e 3
+    const buttons123 = document.querySelectorAll('#button-container-123 .button');
+    buttons123.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            if (!column123Clicked) {
+                moveColumnsByButton123(index + 1);
+                column123Clicked = true;
+                column456Clicked = false;
+                column789Clicked = false;
+            }
+        });
+    });
+
+    // Event listeners para os botões das colunas 4, 5 e 6
+    const buttons456 = document.querySelectorAll('#button-container-456 .button');
+    buttons456.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            if (!column456Clicked) {
+                moveColumnsByButton456(index + 4);
+                column123Clicked = false;
+                column456Clicked = true;
+                column789Clicked = false;
+            }
+        });
+    });
+
+    // Event listeners para os botões das colunas 7, 8 e 9
+    const buttons789 = document.querySelectorAll('#button-container-789 .button');
+    buttons789.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            if (!column789Clicked) {
+                moveColumnsByButton789(index + 7);
+                column123Clicked = false;
+                column456Clicked = false;
+                column789Clicked = true;
+            }
+        });
+    });
+}
+
+// Função para exibir as cartas nas colunas 1, 2 e 3
+function displayInitialCards() {
+    for (let i = 1; i <= 3; i++) {
+        const column = document.getElementById(`column-${i}`);
+        for (let j = 1; j <= 7; j++) {
+            const cardImg = document.createElement('img');
+            cardImg.classList.add('card');
+            cardImg.src = `cartas/${j + (i - 1) * 7}.png`; // Caminho para as imagens
+            column.appendChild(cardImg);
+        }
+    }
+}
+
+// Função para mover as colunas 1, 2 e 3 de acordo com o botão clicado
+function moveColumnsByButton123(buttonIndex) {
+    const columns = [1, 2, 3];
+    const container = document.getElementById('container-123');
+
+    // Determinar a nova ordem das colunas 1, 2 e 3
+    let newColumnsOrder;
+    if (buttonIndex === 1) {
+        newColumnsOrder = [2, 1, 3];
+    } else if (buttonIndex === 2) {
+        newColumnsOrder = [3, 2, 1];
+    } else if (buttonIndex === 3) {
+        newColumnsOrder = [1, 3, 2];
+    }
+
+    // Realizar a reordenação das colunas
+    newColumnsOrder.forEach((newIndex, oldIndex) => {
+        const column = document.getElementById(`column-${columns[oldIndex]}`);
+        container.removeChild(column);
+        container.insertBefore(column, container.children[newIndex - 1]);
+    });
+
+    // Distribuir as cartas das colunas 1, 2 e 3 para as colunas 4, 5 e 6
+    distributeCards();
+}
+
+// Função para mover as colunas 4, 5 e 6 de acordo com o botão clicado
+function moveColumnsByButton456(buttonIndex) {
+    const columns = [4, 5, 6];
+    const container = document.getElementById('container-456');
+
+    // Determinar a nova ordem das colunas 4, 5 e 6
+    let newColumnsOrder;
+    if (buttonIndex === 4) {
+        newColumnsOrder = [5, 4, 6];
+    } else if (buttonIndex === 5) {
+        newColumnsOrder = [6, 5, 4];
+    } else if (buttonIndex === 6) {
+        newColumnsOrder = [4, 6, 5];
+    }
+
+    // Realizar a reordenação das colunas
+    newColumnsOrder.forEach((newIndex, oldIndex) => {
+        const column = document.getElementById(`column-${columns[oldIndex]}`);
+        container.removeChild(column);
+        container.insertBefore(column, container.children[newIndex - 4]);
+    });
+
+    // Distribuir as cartas das colunas 4, 5 e 6 para as colunas 7, 8 e 9
+    distributeCards789();
+}
+
+// Função para mover as colunas 7, 8 e 9 de acordo com o botão clicado
+function moveColumnsByButton789(buttonIndex) {
+    const columns = [7, 8, 9];
+    const container = document.getElementById('container-789');
+
+    // Determinar a nova ordem das colunas 7, 8 e 9
+    let newColumnsOrder;
+    if (buttonIndex === 7) {
+        newColumnsOrder = [8, 7, 9];
+    } else if (buttonIndex === 8) {
+        newColumnsOrder = [9, 8, 7];
+    } else if (buttonIndex === 9) {
+        newColumnsOrder = [7, 9, 8];
+    }
+
+    // Realizar a reordenação das colunas
+    newColumnsOrder.forEach((newIndex, oldIndex) => {
+        const column = document.getElementById(`column-${columns[oldIndex]}`);
+        container.removeChild(column);
+        container.insertBefore(column, container.children[newIndex - 7]);
+    });
+}
+
+// Função para distribuir cartas das colunas 1, 2 e 3 para as colunas 4, 5 e 6
+function distributeCards() {
+    const columns123 = [1, 2, 3];
+    const columns456 = [4, 5, 6];
+    const container456 = document.getElementById('container-456');
+
+    let cardsToMove = [];
+
+    // Pegar as cartas das colunas 1, 2 e 3 na ordem atual
+    const currentOrder = getCurrentColumnOrder();
+    currentOrder.forEach((columnIndex) => {
+        const column = document.getElementById(`column-${columnIndex}`);
+        const cards = column.querySelectorAll('.card');
+        cards.forEach((card) => {
+            cardsToMove.push(card.cloneNode(true));
+        });
+    });
+
+    // Distribuir as cartas intercaladamente nas colunas 4, 5 e 6
+    let columnIndex456 = 0;
+    let cardIndex = 0;
+    while (cardIndex < cardsToMove.length) {
+        const column456 = document.getElementById(`column-${columns456[columnIndex456]}`);
+        column456.appendChild(cardsToMove[cardIndex]);
+        cardIndex++;
+        columnIndex456 = (columnIndex456 + 1) % 3;
+    }
+}
+
+// Função para distribuir cartas das colunas 4, 5 e 6 para as colunas 7, 8 e 9
+function distributeCards789() {
+    const columns456 = [4, 5, 6];
+    const columns789 = [7, 8, 9];
+    const container789 = document.getElementById('container-789');
+
+    let cardsToMove = [];
+
+    // Pegar as cartas das colunas 4, 5 e 6 na ordem atual
+    const currentOrder = getCurrentColumnOrder456();
+    currentOrder.forEach((columnIndex) => {
+        const column = document.getElementById(`column-${columnIndex}`);
+        const cards = column.querySelectorAll('.card');
+        cards.forEach((card) => {
+            cardsToMove.push(card.cloneNode(true));
+        });
+    });
+
+    // Distribuir as cartas intercaladamente nas colunas 7, 8 e 9
+    let columnIndex789 = 0;
+    let cardIndex = 0;
+    while (cardIndex < cardsToMove.length) {
+        const column789 = document.getElementById(`column-${columns789[columnIndex789]}`);
+        column789.appendChild(cardsToMove[cardIndex]);
+        cardIndex++;
+        columnIndex789 = (columnIndex789 + 1) % 3;
+    }
+}
+
+// Função para obter a ordem atual das colunas 1, 2 e 3
+function getCurrentColumnOrder() {
+    const columns = [1, 2, 3];
+    const container123 = document.getElementById('container-123');
+    const currentOrder = [];
+
+    // Obtém a ordem atual das colunas
+    for (let i = 0; i < container123.children.length - 1; i++) {
+        const columnId = parseInt(container123.children[i].id.split('-')[1]);
+        currentOrder.push(columnId);
+    }
+
+    return currentOrder;
+}
+
+// Função para obter a ordem atual das colunas 4, 5 e 6
+function getCurrentColumnOrder456() {
+    const columns = [4, 5, 6];
+    const container456 = document.getElementById('container-456');
+    const currentOrder = [];
+
+    // Obtém a ordem atual das colunas
+    for (let i = 0; i < container456.children.length - 1; i++) {
+        const columnId = parseInt(container456.children[i].id.split('-')[1]);
+        currentOrder.push(columnId);
+    }
+
+    return currentOrder;
+}
+
+// Função para exibir a carta desejada ao clicar no botão "A sua carta é"
+document.getElementById('show-selected-card').addEventListener('click', function() {
+    // Obter a ordem atual das colunas 7, 8 e 9
+    const currentOrder789 = getCurrentColumnOrder789();
+
+    // Contar as cartas nas três últimas colunas
+    let totalCards = 0;
+    let cardsFound = 0;
+    let selectedCard;
+
+    for (let i = 0; i < currentOrder789.length; i++) {
+        const columnNumber = currentOrder789[i];
+        const column = document.getElementById(`column-${columnNumber}`);
+        const cards = column.querySelectorAll('.card');
+        
+        // Iterar sobre as cartas na coluna atual
+        for (let j = 0; j < cards.length; j++) {
+            totalCards++;
+            cardsFound++;
+
+            // Verificar se encontramos a 11ª carta
+            if (cardsFound === 11) {
+                selectedCard = cards[j].cloneNode(true); // Clonar a carta desejada
+                break; // Parar o loop interno quando a carta desejada for encontrada
+            }
+        }
+
+        if (cardsFound === 11) {
+            break; // Parar o loop externo quando a carta desejada for encontrada
+        }
+    }
+
+    // Determinar a carta desejada
+    if (totalCards < 11) {
+        selectedCard = document.createElement('p');
+        selectedCard.textContent = "Não há cartas suficientes para exibir.";
+    }
+
+    // Exibir a carta selecionada
+    const selectedCardContainer = document.getElementById('selected-card-container');
+    selectedCardContainer.innerHTML = ''; // Limpar o conteúdo anterior
+    selectedCardContainer.appendChild(selectedCard);
+});
+
+// Função para obter a ordem atual das colunas 7, 8 e 9
+function getCurrentColumnOrder789() {
+    const columns = [7, 8, 9];
+    const container789 = document.getElementById('container-789');
+    const currentOrder = [];
+
+    // Obtém a ordem atual das colunas
+    for (let i = 0; i < container789.children.length - 1; i++) {
+        const columnId = parseInt(container789.children[i].id.split('-')[1]);
+        currentOrder.push(columnId);
+    }
+
+    return currentOrder;
+}
+</script>
+
+</body>
+</html>
+
